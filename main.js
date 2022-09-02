@@ -37,18 +37,100 @@ function clearCharacters() {
 }
 
 const getAllChars = () => {
+  clearCharacters()
+
   axios.get(`${baseURL}/characters`)
-  //for the true return if everything is all good 
+  //for the return if everything is all good 
   .then((res) => {
-    console.log(res)
+    console.log(res.data)
+    let characterArray = res.data
+
+    for(let i = 0; i < characterArray.length; 1++){
+      createCharacterCard(characterArray[i])
+    }
   })
-  //for a flase return of an error
+  //for the return of an error
   .catch((error) => {
     console.log(error)
   })
 
 }
 
+const getOneChar = (event) => {
+clearCharacters()
+
+axios.get(`${baseURL}/character/${event.target.id}`)
+.then((res) => {
+  console.log(res.data)
+  singleChar = res.data
+  createCharacterCard(singleChar)
+})
+.catch((error) => {
+  console.log(error)
+})
+}
+
+const addNewChar = (event) => {
+  event.preventDefault()
+
+  clearCharacters()
+
+  let newLikes = [...newLikesText.value.split(',')]
+  console.log(newLikes)
+
+let bodyObject = {
+  firstName: newFirstInput.value,
+  lastName: newLastInput.value,
+  gender: newGenderDropDown.value,
+  age: newAgeInput.value,
+  likes: newLikes
+
+}
+axios.post(`${baseURL}/character`, bodyObject)
+.then((res) => {
+  let newArr = res.data
+
+for(let i = 0; i < newArr.length; i++){
+  createCharacterCard(newArr[i])
+}
+
+  })
+     .catch((err) => {
+      console.log(err)
+   })
+
+
+}
+
+const getOldChars = (event) => {
+  event.preventDefault()
+
+  clearCharacters()
+
+  axios.get(`${baseURL}/character/?age=${ageInput.value}`)
+  .then((res) => {
+    let OldChars = res.data
+
+    for(let i = 0; i < OldChars.length; i++){
+      createCharacterCard(OldChars[i])
+    }
+
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+}
+
 // combine Steps 1 and 2 using addEventLisenter
 
 getAllBtn.addEventListener('click', getAllChars)
+
+for(i = 0; i < charBtns.length; i++) {
+
+charBtns[i].addEventListener('click', getOneChar)
+
+}
+
+createForm.addEventListener('submit', addNewChar)
+
+ageForm.addEventListener('submit', getOldChars)
